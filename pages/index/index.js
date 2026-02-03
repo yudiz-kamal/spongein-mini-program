@@ -1,35 +1,92 @@
 Page({
+  data: {
+    isLoading: true,
+    hasError: false,
+    errorMessage: '',
+  },
+
   onLoad(query) {
-    // 页面加载
-    console.info(`Page onLoad with query: ${JSON.stringify(query)}`);
+    console.info('Page onLoad with query: ' + JSON.stringify(query));
+    this.setData({ isLoading: true, hasError: false });
   },
+
   onReady() {
-    // 页面加载完成
+    // Page rendering complete
   },
+
   onShow() {
-    // 页面显示
+    // Page becomes visible
   },
+
   onHide() {
-    // 页面隐藏
+    // Page becomes hidden
   },
+
   onUnload() {
-    // 页面被关闭
+    // Page is closed
   },
+
   onTitleClick() {
-    // 标题被点击
+    // Title bar clicked
   },
+
   onPullDownRefresh() {
-    // 页面被下拉
+    this.setData({ isLoading: true, hasError: false });
+    my.stopPullDownRefresh();
   },
+
   onReachBottom() {
-    // 页面被拉到底部
+    // Scrolled to bottom
   },
+
   onShareAppMessage() {
-    // 返回自定义分享信息
     return {
       title: 'Spongein - Your Learning Journey',
       desc: 'Join me on Spongein to enhance your learning!',
       path: 'pages/index/index',
     };
+  },
+
+  // Handle messages from the web application
+  onMessageHandler(e) {
+    console.info('Message from WebView:', e.detail);
+    var detail = e.detail || {};
+    var type = detail.type;
+    var data = detail.data || {};
+
+    switch (type) {
+      case 'navigate':
+        if (data.url) {
+          my.navigateTo({ url: data.url });
+        }
+        break;
+      case 'share':
+        // Handle share request from web app
+        break;
+      default:
+        console.info('Unhandled message type:', type);
+    }
+  },
+
+  // WebView loaded successfully
+  onWebViewLoad() {
+    this.setData({ isLoading: false, hasError: false });
+  },
+
+  // WebView failed to load
+  onWebViewError(e) {
+    console.error('WebView load error:', e.detail);
+    this.setData({
+      isLoading: false,
+      hasError: true,
+      errorMessage: 'Failed to load content. Please check your connection.',
+    });
+  },
+
+  // Retry loading the page
+  onRetry() {
+    this.setData({ isLoading: true, hasError: false });
+    // Reload the page
+    my.reLaunch({ url: '/pages/index/index' });
   },
 });

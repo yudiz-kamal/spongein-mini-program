@@ -1,5 +1,26 @@
-<web-view
-  id="web-view-1"
-  src="https://spongein.lc.webdevprojects.cloud/"
-  onMessage="onMessageHandler"
-/>
+<view class="container">
+  <!-- Loading Overlay -->
+  <view class="loading-overlay" a:if="{{isLoading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">Loading Spongein...</text>
+  </view>
+
+  <!-- Error State -->
+  <view class="error-container" a:if="{{hasError}}">
+    <text class="error-icon">⚠️</text>
+    <text class="error-message">{{errorMessage}}</text>
+    <view class="retry-button" onTap="onRetry">
+      <text class="retry-text">Tap to Retry</text>
+    </view>
+  </view>
+
+  <!-- WebView -->
+  <web-view
+    a:if="{{!hasError}}"
+    id="web-view-1"
+    src="https://spongein.lc.webdevprojects.cloud/"
+    onMessage="onMessageHandler"
+    onLoad="onWebViewLoad"
+    onError="onWebViewError"
+  />
+</view>
