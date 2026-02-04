@@ -16,7 +16,7 @@ Page({
           buttonText: 'OK',
         });
         // Send authCode to WebView
-        this.sendToWebView('authCode', { code: res.authCode })
+        this.sendToWebView('authCode', { authCode: res.authCode })
       },
       fail: (err) => {
         console.error('Failed to get auth code:', err)
@@ -26,7 +26,7 @@ Page({
 
   sendToWebView(type, data) {
     if (this.webViewContext) {
-      this.webViewContext.postMessage({ type, data });
+      this.webViewContext.postMessage({ action: { type, detail: data } });
     } else {
       console.warn('WebView context not ready yet. Queuing message?');
     }
