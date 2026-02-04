@@ -2,7 +2,10 @@ Page({
   onLoad(query) {
     // Create webview context to send messages to H5
     this.webViewContext = my.createWebViewContext('web-view-1')
-    this.getUserInfo()
+     // Wait a bit for webview to be ready
+     setTimeout(() => {
+      this.getUserInfo()
+    }, 1000)
   },
 
   // Get user info from VodaPay
@@ -10,26 +13,18 @@ Page({
     my.getAuthCode({
       scopes: ['auth_user'],
       success: (res) => {
-        my.alert({
-          title: 'Auth Code',
-          content: res.authCode,
-          buttonText: 'OK',
+        // VodaPay WebView communication requires my.postMessage
+        my.postMessage({
+          action: {
+            type: 'authCode',
+            detail: { authCode: res.authCode }
+          }
         });
-        // Send authCode to WebView
-        this.sendToWebView('authCode', { authCode: res.authCode })
       },
       fail: (err) => {
         console.error('Failed to get auth code:', err)
       }
     })
-  },
-
-  sendToWebView(type, data) {
-    if (this.webViewContext) {
-      this.webViewContext.postMessage({ action: { type, detail: data } });
-    } else {
-      console.warn('WebView context not ready yet. Queuing message?');
-    }
   },
 
   onReady() {
@@ -70,7 +65,6 @@ Page({
 
   // Handle messages from the web application
   onMessageHandler(e) {
-    console.info('Message from WebView:', e.detail);
     var detail = e.detail || {};
     var type = detail.type;
     var data = detail.data || {};
