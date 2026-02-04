@@ -6,8 +6,47 @@ Page({
   },
 
   onLoad(query) {
-    console.info('Page onLoad with query: ' + JSON.stringify(query));
-    this.setData({ isLoading: true, hasError: false });
+    // Create webview context to send messages to H5
+    this.webViewContext = my.createWebViewContext('web-view-1')
+  },
+
+  // Get user info from VodaPay
+  getUserInfo() {
+    my.getAuthCode({
+      scopes: ['auth_user'],
+      success: (res) => {
+        // Send authCode to WebView
+        my.alert({
+          title: 'Auth Code',
+          content: res.authCode,
+          buttonText: 'OK',
+        });
+        this.webViewContext.postMessage({ type: 'authCode', code: res.authCode });
+
+        // Also get user info if needed
+        my.getOpenUserInfo({
+          success: (userInfoRes) => {
+            my.alert({
+              title: 'User Info',
+              content: JSON.stringify(userInfoRes),
+              buttonText: 'OK',
+            });
+            this.webViewContext.postMessage({ type: 'userInfo', data: userInfoRes });
+          }
+        });
+      },
+      fail: (err) => {
+        console.error('Failed to get auth code:', err)
+      }
+    })
+  },
+
+  sendToWebView(type, data) {
+    if (this.webViewContext) {
+      this.webViewContext.postMessage({ type, data });
+    } else {
+      console.warn('WebView context not ready yet. Queuing message?');
+    }
   },
 
   onReady() {
@@ -31,8 +70,7 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.setData({ isLoading: true, hasError: false });
-    my.stopPullDownRefresh();
+    my.startPullDownRefresh()
   },
 
   onReachBottom() {
@@ -55,6 +93,10 @@ Page({
     var data = detail.data || {};
 
     switch (type) {
+      case 'clientReady':
+        console.info('Client is ready, fetching auth info...');
+        this.getUserInfo();
+        break;
       case 'navigate':
         if (data.url) {
           my.navigateTo({ url: data.url });
@@ -66,27 +108,5 @@ Page({
       default:
         console.info('Unhandled message type:', type);
     }
-  },
-
-  // WebView loaded successfully
-  onWebViewLoad() {
-    this.setData({ isLoading: false, hasError: false });
-  },
-
-  // WebView failed to load
-  onWebViewError(e) {
-    console.error('WebView load error:', e.detail);
-    this.setData({
-      isLoading: false,
-      hasError: true,
-      errorMessage: 'Failed to load content. Please check your connection.',
-    });
-  },
-
-  // Retry loading the page
-  onRetry() {
-    this.setData({ isLoading: true, hasError: false });
-    // Reload the page
-    my.reLaunch({ url: '/pages/index/index' });
-  },
+  }
 });
