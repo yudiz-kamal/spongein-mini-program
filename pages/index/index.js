@@ -21,7 +21,7 @@ Page({
           content: res.authCode,
           buttonText: 'OK',
         });
-        this.webViewContext.postMessage({ type: 'authCode', code: res.authCode });
+        this.webViewContext.postMessage({ action: { type: 'authCode', detail: { authCode: res.authCode } } });
 
         // Also get user info if needed
         my.getOpenUserInfo({
@@ -31,7 +31,7 @@ Page({
               content: JSON.stringify(userInfoRes),
               buttonText: 'OK',
             });
-            this.webViewContext.postMessage({ type: 'userInfo', data: userInfoRes });
+            this.webViewContext.postMessage({ action: { type: 'userInfo', detail: userInfoRes } });
           }
         });
       },
@@ -89,8 +89,9 @@ Page({
   onMessageHandler(e) {
     console.info('Message from WebView:', e.detail);
     var detail = e.detail || {};
-    var type = detail.type;
-    var data = detail.data || {};
+    var action = detail.action || {};
+    var type = action.type;
+    var data = action.detail || {};
 
     switch (type) {
       case 'clientReady':
