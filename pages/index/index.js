@@ -1,13 +1,8 @@
 Page({
-  data: {
-    isLoading: true,
-    hasError: false,
-    errorMessage: '',
-  },
-
   onLoad(query) {
     // Create webview context to send messages to H5
     this.webViewContext = my.createWebViewContext('web-view-1')
+    this.getUserInfo()
   },
 
   // Get user info from VodaPay
@@ -15,25 +10,13 @@ Page({
     my.getAuthCode({
       scopes: ['auth_user'],
       success: (res) => {
-        // Send authCode to WebView
         my.alert({
           title: 'Auth Code',
           content: res.authCode,
           buttonText: 'OK',
         });
-        this.webViewContext.postMessage({ action: { type: 'authCode', detail: { authCode: res.authCode } } });
-
-        // Also get user info if needed
-        my.getOpenUserInfo({
-          success: (userInfoRes) => {
-            my.alert({
-              title: 'User Info',
-              content: JSON.stringify(userInfoRes),
-              buttonText: 'OK',
-            });
-            this.webViewContext.postMessage({ action: { type: 'userInfo', detail: userInfoRes } });
-          }
-        });
+        // Send authCode to WebView
+        this.sendToWebView('authCode', { code: res.authCode })
       },
       fail: (err) => {
         console.error('Failed to get auth code:', err)
@@ -89,15 +72,10 @@ Page({
   onMessageHandler(e) {
     console.info('Message from WebView:', e.detail);
     var detail = e.detail || {};
-    var action = detail.action || {};
-    var type = action.type;
-    var data = action.detail || {};
+    var type = detail.type;
+    var data = detail.data || {};
 
     switch (type) {
-      case 'clientReady':
-        console.info('Client is ready, fetching auth info...');
-        this.getUserInfo();
-        break;
       case 'navigate':
         if (data.url) {
           my.navigateTo({ url: data.url });
