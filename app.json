@@ -5,6 +5,6 @@
   "window": {
     "defaultTitle": "Spongein",
     "titleBarColor": "#1E40AF",
-    "pullRefresh": false
+    "pullRefresh": true
   }
 }
