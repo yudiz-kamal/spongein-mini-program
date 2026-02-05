@@ -1,3 +1,6 @@
 {
-    "pullRefresh": true
-}
+    "defaultTitle": "Spongein",
+    "pullRefresh": true,
+    "allowsBounceVertical": "YES",
+    "titleBarColor": "#1E40AF"
+  }

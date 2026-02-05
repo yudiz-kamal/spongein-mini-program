@@ -1,5 +1,9 @@
-<web-view
-  id="web-view-1"
-  src="https://spongein.lc.webdevprojects.cloud/"
-  onMessage="onMessageHandler"
-/>
+<view class="container">
+  <web-view
+    id="web-view-1"
+    src="https://spongein.lc.webdevprojects.cloud/"
+    onMessage="onMessageHandler"
+    onLoad="onWebViewLoad"
+    onError="onWebViewError"
+  />
+</view>

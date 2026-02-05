@@ -1,9 +1,10 @@
 {
-  "subPackageBuildType": "shared",
   "pages": [
     "pages/index/index"
   ],
   "window": {
-    "defaultTitle": "Spongein"
+    "defaultTitle": "Spongein",
+    "titleBarColor": "#1E40AF",
+    "pullRefresh": false
   }
 }
