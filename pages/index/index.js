@@ -211,6 +211,25 @@ Page({
         })
         break
         
+      case 'paymentComplete':
+        // Payment completed (success or failure)
+        console.log('Payment completed:', data)
+        
+        if (data.success) {
+          my.showToast({
+            type: 'success',
+            content: data.message || 'Payment successful!',
+            duration: 3000
+          })
+        } else {
+          my.showToast({
+            type: 'fail',
+            content: data.message || 'Payment failed',
+            duration: 3000
+          })
+        }
+        break
+        
       default:
         console.info('Unhandled message type:', type, data)
     }
